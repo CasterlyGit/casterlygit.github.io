@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tarun · I build small, agentic tools</title>
+<meta name="description" content="A complete local voice/gesture/agent loop for Claude Code, plus a handful of shipped tools. One engineer, team pace. Live demos for everything." />
+<meta property="og:title" content="Tarun · CasterlyGit" />
+<meta property="og:description" content="A complete local voice/gesture/agent loop for Claude Code. Live demos, no need to read code." />
+<style>
+  :root {
+    --bg:        #08090d;
+    --bg-elev:   #12141b;
+    --bg-card:   #181b25;
+    --bg-card2:  #1f2330;
+    --line:      #232631;
+    --text:      #f1f3f5;
+    --text-dim:  #8a91a0;
+    --text-faint:#525969;
+    --hero:      #00d4a8;
+    --hero-glow: rgba(0, 212, 168, 0.6);
+    --voice:     #00d4a8;
+    --gesture:   #b487ff;
+    --agent:     #ff8a4c;
+    --neon:      #ff5dcf;
+    --mono: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+    --body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+  body {
+    background:
+      radial-gradient(1100px 700px at 8% -10%, rgba(0, 212, 168, 0.10), transparent 60%),
+      radial-gradient(900px 600px at 100% 10%, rgba(180, 135, 255, 0.07), transparent 60%),
+      radial-gradient(800px 600px at 50% 100%, rgba(255, 138, 76, 0.06), transparent 60%),
+      var(--bg);
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  /* ---------- header ---------- */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 56px;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-mark {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--hero), #008f73);
+    box-shadow: 0 0 24px var(--hero-glow);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-weight: 700; color: #061d18;
+  }
+  .brand-text {
+    font-family: var(--mono); font-size: 13px; color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+  .brand-text b { color: var(--text); }
+  .nav { display: flex; gap: 22px; }
+  .nav a {
+    font-family: var(--mono); font-size: 12px; color: var(--text-dim);
+    text-decoration: none; transition: color 150ms;
+  }
+  .nav a:hover { color: var(--text); }
+
+  /* ---------- hero ---------- */
+  .hero { margin-bottom: 64px; }
+  .hero .tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px;
+    font-family: var(--mono); font-size: 11px; color: var(--text-dim);
+    margin-bottom: 24px;
+  }
+  .hero .tag .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--hero);
+    box-shadow: 0 0 8px var(--hero-glow);
+  }
+  h1 {
+    font-size: clamp(34px, 5.5vw, 60px);
+    line-height: 1.05; letter-spacing: -0.02em; font-weight: 800;
+    margin-bottom: 20px; max-width: 920px;
+  }
+  h1 .v { color: var(--voice); }
+  h1 .g { color: var(--gesture); }
+  h1 .a { color: var(--agent); }
+  .lede {
+    font-size: 18px; color: var(--text-dim); max-width: 680px;
+    line-height: 1.55;
+  }
+  .lede em { color: var(--text); font-style: normal; }
+  .cta-row {
+    margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap;
+  }
+  .cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 12px 18px; border-radius: 10px;
+    font-family: var(--mono); font-size: 13px;
+    text-decoration: none; transition: all 180ms;
+    border: 1px solid var(--line);
+  }
+  .cta.primary {
+    background: var(--hero); color: #042620; border-color: var(--hero);
+    font-weight: 700;
+  }
+  .cta.primary:hover {
+    box-shadow: 0 0 24px var(--hero-glow);
+  }
+  .cta.ghost { background: transparent; color: var(--text); }
+  .cta.ghost:hover { border-color: var(--text-dim); }
+  .cta .arrow { transition: transform 180ms; }
+  .cta:hover .arrow { transform: translateX(3px); }
+
+  /* ---------- stack diagram ---------- */
+  .stack-section { margin-bottom: 72px; }
+  .section-eyebrow {
+    font-family: var(--mono); font-size: 11px; color: var(--text-faint);
+    letter-spacing: 0.18em; margin-bottom: 14px;
+  }
+  .section-h {
+    font-size: clamp(22px, 3vw, 30px); line-height: 1.2; font-weight: 700;
+    margin-bottom: 14px; letter-spacing: -0.01em;
+  }
+  .section-sub {
+    color: var(--text-dim); font-size: 15px; max-width: 680px;
+    line-height: 1.55; margin-bottom: 32px;
+  }
+
+  .stack {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px; margin-bottom: 28px;
+  }
+  @media (max-width: 820px) { .stack { grid-template-columns: 1fr; } }
+  .layer {
+    background: var(--bg-elev); border: 1px solid var(--line);
+    border-radius: 14px; padding: 22px 22px 18px;
+    text-decoration: none; color: inherit;
+    transition: all 200ms ease-out;
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+  }
+  .layer::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(220px 120px at 80% 0%, var(--glow), transparent 60%);
+    opacity: 0.18; pointer-events: none;
+  }
+  .layer:hover {
+    transform: translateY(-2px);
+    border-color: var(--c);
+  }
+  .layer:hover::before { opacity: 0.4; }
+  .layer .modality {
+    font-family: var(--mono); font-size: 10px; color: var(--text-faint);
+    letter-spacing: 0.18em; margin-bottom: 12px;
+  }
+  .layer .icon {
+    font-size: 32px; margin-bottom: 14px;
+  }
+  .layer h3 {
+    font-size: 19px; font-weight: 700; margin-bottom: 8px;
+  }
+  .layer h3 .c { color: var(--c); }
+  .layer p {
+    font-size: 13.5px; color: var(--text-dim); line-height: 1.5;
+    margin-bottom: 16px; flex: 1;
+  }
+  .layer .links {
+    display: flex; gap: 10px; align-items: center;
+    font-family: var(--mono); font-size: 11.5px;
+  }
+  .layer .links .demo {
+    color: var(--c); font-weight: 700;
+  }
+  .layer .links .gh {
+    color: var(--text-faint);
+  }
+  .layer.voice   { --c: var(--voice);   --glow: var(--voice); }
+  .layer.gesture { --c: var(--gesture); --glow: var(--gesture); }
+  .layer.agent   { --c: var(--agent);   --glow: var(--agent); }
+
+  .stack-flow {
+    display: flex; align-items: center; justify-content: center;
+    gap: 14px; flex-wrap: wrap;
+    font-family: var(--mono); font-size: 12px; color: var(--text-dim);
+    background: var(--bg-elev); border: 1px solid var(--line);
+    border-radius: 12px; padding: 16px 20px;
+  }
+  .stack-flow .node { display: inline-flex; align-items: center; gap: 8px; }
+  .stack-flow .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .stack-flow .dot.voice   { background: var(--voice);   box-shadow: 0 0 8px var(--voice); }
+  .stack-flow .dot.gesture { background: var(--gesture); box-shadow: 0 0 8px var(--gesture); }
+  .stack-flow .dot.agent   { background: var(--agent);   box-shadow: 0 0 8px var(--agent); }
+  .stack-flow .arrow { color: var(--text-faint); }
+
+  /* ---------- other projects ---------- */
+  .other-section { margin-bottom: 64px; }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--bg-elev); border: 1px solid var(--line);
+    border-radius: 12px; padding: 18px 18px 16px;
+    text-decoration: none; color: inherit;
+    transition: all 180ms;
+    display: flex; flex-direction: column;
+  }
+  .card:hover { border-color: var(--text-dim); transform: translateY(-2px); }
+  .card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .card .tag {
+    font-family: var(--mono); font-size: 10px; color: var(--text-faint);
+    letter-spacing: 0.12em; margin-bottom: 10px;
+  }
+  .card p {
+    font-size: 13px; color: var(--text-dim); line-height: 1.5;
+    margin-bottom: 12px; flex: 1;
+  }
+  .card .row {
+    font-family: var(--mono); font-size: 11px; color: var(--text-faint);
+    display: flex; gap: 10px;
+  }
+  .card .row .live { color: var(--hero); font-weight: 700; }
+
+  /* ---------- how I work ---------- */
+  .how-section { margin-bottom: 64px; }
+  .pipeline {
+    background: var(--bg-elev); border: 1px solid var(--line);
+    border-radius: 14px; padding: 26px 24px;
+    font-family: var(--mono); font-size: 13.5px; line-height: 1.8;
+    color: var(--text-dim);
+    overflow-x: auto;
+  }
+  .pipeline .step { color: var(--text); }
+  .pipeline .arrow { color: var(--text-faint); padding: 0 6px; }
+
+  /* ---------- footer ---------- */
+  footer {
+    margin-top: 80px; padding-top: 32px; border-top: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--mono); font-size: 11px; color: var(--text-faint);
+    flex-wrap: wrap; gap: 12px;
+  }
+  footer a { color: var(--text-dim); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  /* ---------- entry animation ---------- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero, .stack-section, .other-section, .how-section {
+    animation: fadeUp 600ms ease-out both;
+  }
+  .stack-section { animation-delay: 80ms; }
+  .other-section { animation-delay: 160ms; }
+  .how-section   { animation-delay: 240ms; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">T</div>
+      <div class="brand-text"><b>Tarun</b> · agentic dev tools · macOS</div>
+    </div>
+    <nav class="nav">
+      <a href="#stack">stack</a>
+      <a href="#projects">projects</a>
+      <a href="#work">how i work</a>
+      <a href="https://github.com/CasterlyGit" target="_blank" rel="noopener">github</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="tag"><span class="dot"></span> shipping at single-engineer team-pace</div>
+    <h1>
+      A complete local <span class="v">voice</span>,
+      <span class="g">gesture</span>, and <span class="a">agent</span> loop
+      for Claude Code.
+    </h1>
+    <p class="lede">
+      I build small tools where one engineer ships at team pace.
+      <em>Mostly macOS. Mostly Python and TypeScript.</em> Mostly AI-augmented dev workflows.
+      Each project below ships v0.1 in days and has a live demo — <em>no need to read code.</em>
+    </p>
+    <div class="cta-row">
+      <a class="cta primary" href="#stack">
+        See the stack <span class="arrow">→</span>
+      </a>
+      <a class="cta ghost" href="https://github.com/CasterlyGit" target="_blank" rel="noopener">
+        Browse the code
+      </a>
+    </div>
+  </section>
+
+  <!-- ---------------- FEATURED STACK ---------------- -->
+  <section id="stack" class="stack-section">
+    <div class="section-eyebrow">FEATURED · START HERE</div>
+    <h2 class="section-h">The voice / gesture / agent stack</h2>
+    <p class="section-sub">
+      Three tools, one story: speak a task, gesture the confirmation, an autonomous agent
+      does the work — all running locally. Click any layer for the live demo.
+    </p>
+
+    <div class="stack">
+      <a class="layer voice" href="https://casterlygit.github.io/laptop-dictation/" target="_blank" rel="noopener">
+        <div class="modality">MODALITY · VOICE IN</div>
+        <div class="icon">🎙</div>
+        <h3>laptop-dictation <span class="c">·</span></h3>
+        <p>Hold a hotkey, talk, release. Whisper transcribes locally, pastes into the focused app, presses Enter. True voice interface for Claude Code.</p>
+        <div class="links">
+          <span class="demo">live demo →</span>
+          <span class="gh">· github</span>
+        </div>
+      </a>
+
+      <a class="layer gesture" href="https://casterlygit.github.io/hand-signal/" target="_blank" rel="noopener">
+        <div class="modality">MODALITY · GESTURE IN</div>
+        <div class="icon">✋</div>
+        <h3>hand-signal <span class="c">·</span></h3>
+        <p><code>handsignal ask "approve?"</code> pops a focused window. 👍 approves, 👎 denies, ✊ hands control back to you. MediaPipe Hands, all local.</p>
+        <div class="links">
+          <span class="demo">live demo →</span>
+          <span class="gh">· github</span>
+        </div>
+      </a>
+
+      <a class="layer agent" href="https://casterlygit.github.io/curby/" target="_blank" rel="noopener">
+        <div class="modality">MODALITY · AGENT OUT</div>
+        <div class="icon">🤖</div>
+        <h3>curby <span class="c">·</span></h3>
+        <p>Voice task → autonomous Claude Code agent runs it in a sandbox. Each task gets a neon-cursor puck with live status, pause, cancel, amend.</p>
+        <div class="links">
+          <span class="demo">live demo →</span>
+          <span class="gh">· github</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="stack-flow">
+      <span class="node"><span class="dot voice"></span> hold hotkey, speak</span>
+      <span class="arrow">→</span>
+      <span class="node"><span class="dot agent"></span> agent runs in sandbox</span>
+      <span class="arrow">→</span>
+      <span class="node"><span class="dot gesture"></span> 👍 to approve, 👎 to deny</span>
+      <span class="arrow">→</span>
+      <span class="node">✅ done</span>
+    </div>
+  </section>
+
+  <!-- ---------------- OTHER PROJECTS ---------------- -->
+  <section id="projects" class="other-section">
+    <div class="section-eyebrow">SHIPPED · OTHER WORK</div>
+    <h2 class="section-h">More tools</h2>
+    <p class="section-sub">
+      Beyond the agent stack — domain-specific shipping, daily-driver utilities, and the
+      orchestration layer that makes the loop tight.
+    </p>
+
+    <div class="grid">
+      <a class="card" href="https://casterlygit.github.io/emergency-ai/" target="_blank" rel="noopener">
+        <div class="tag">AI · STREAMING · CACHE</div>
+        <h4>emergency-ai</h4>
+        <p>Sub-2-second jurisdiction-aware SOS responses. Haiku 4.5 + prompt caching + streaming structured output. Grounded in your city's actual laws.</p>
+        <div class="row"><span class="live">live demo →</span> <span>· github</span></div>
+      </a>
+
+      <a class="card" href="https://casterlygit.github.io/neon-stereo/" target="_blank" rel="noopener">
+        <div class="tag">ELECTRON · MUSIC · DESIGN</div>
+        <h4>neon-stereo</h4>
+        <p>Spotify + YouTube Music in one Electron app. Scanline overlays, neon glow, mono readouts. Visual identity as a first-class feature.</p>
+        <div class="row"><span class="live">live demo →</span> <span>· github</span></div>
+      </a>
+
+      <a class="card" href="https://casterlygit.github.io/agent-harness/" target="_blank" rel="noopener">
+        <div class="tag">META · ORCHESTRATOR</div>
+        <h4>agent-harness</h4>
+        <p>Skills, pipeline prompts, and inbox watchers that turn ideas into shipped PRs. Obsidian → issue → branch → PR → merged, minimal human turns. The loop behind everything else.</p>
+        <div class="row"><span class="live">live demo →</span> <span>· github</span></div>
+      </a>
+
+      <a class="card" href="https://casterlygit.github.io/neetcode/" target="_blank" rel="noopener">
+        <div class="tag">PRACTICE · DASHBOARD</div>
+        <h4>neetcode</h4>
+        <p>Daily DSA grind. Auto-synced solutions with a live stats dashboard — streak, language breakdown, difficulty mix, recent solves.</p>
+        <div class="row"><span class="live">live dashboard →</span> <span>· github</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ---------------- HOW I WORK ---------------- -->
+  <section id="work" class="how-section">
+    <div class="section-eyebrow">PROCESS</div>
+    <h2 class="section-h">How I work</h2>
+    <p class="section-sub">
+      Each project ships v0.1 in days, not quarters. The agent-harness above is what makes the loop tight.
+    </p>
+
+    <div class="pipeline">
+      <span class="step">idea</span><span class="arrow">→</span>
+      <span class="step">Obsidian note</span><span class="arrow">→</span>
+      <span class="step">GitHub issue</span><span class="arrow">→</span>
+      <span class="step">/iterate</span><span class="arrow">→</span>
+      <span class="step">branch</span><span class="arrow">→</span>
+      <span class="step">PR</span><span class="arrow">→</span>
+      <span class="step">merged</span><span class="arrow">→</span>
+      <span class="step">live demo</span>
+    </div>
+  </section>
+
+  <footer>
+    <span>github.com/CasterlyGit · single-engineer agentic tooling</span>
+    <span>
+      <a href="https://github.com/CasterlyGit">github</a> ·
+      <a href="https://github.com/CasterlyGit?tab=repositories">all repos</a>
+    </span>
+  </footer>
+
+</div>
+</body>
+</html>
