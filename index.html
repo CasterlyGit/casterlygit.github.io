@@ -22,6 +22,7 @@
     --voice:     #00d4a8;
     --gesture:   #b487ff;
     --agent:     #ff8a4c;
+    --memory:    #7be3d2;
     --game:      #ff5dcf;
     --meter:     #5cd6ff;
     --neon:      #ff5dcf;
@@ -141,8 +142,9 @@
 
   /* stack */
   .stack-section { margin-bottom: 72px; }
-  .stack { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 28px; }
-  @media (max-width: 820px) { .stack { grid-template-columns: 1fr; } }
+  .stack { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+  @media (max-width: 1080px) { .stack { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 620px)  { .stack { grid-template-columns: 1fr; } }
   .layer {
     background: var(--bg-elev); border: 1px solid var(--line);
     border-radius: 14px; padding: 22px 22px 18px;
@@ -169,6 +171,7 @@
   .layer.voice   { --c: var(--voice);   --glow: var(--voice); }
   .layer.gesture { --c: var(--gesture); --glow: var(--gesture); }
   .layer.agent   { --c: var(--agent);   --glow: var(--agent); }
+  .layer.memory  { --c: var(--memory);  --glow: var(--memory); }
 
   .stack-flow {
     display: flex; align-items: center; justify-content: center;
@@ -182,6 +185,7 @@
   .stack-flow .dot.voice   { background: var(--voice);   box-shadow: 0 0 8px var(--voice); }
   .stack-flow .dot.gesture { background: var(--gesture); box-shadow: 0 0 8px var(--gesture); }
   .stack-flow .dot.agent   { background: var(--agent);   box-shadow: 0 0 8px var(--agent); }
+  .stack-flow .dot.memory  { background: var(--memory);  box-shadow: 0 0 8px var(--memory); }
   .stack-flow .arrow { color: var(--text-faint); }
 
   /* other */
@@ -332,10 +336,11 @@
   <!-- ---------------- FEATURED STACK ---------------- -->
   <section id="stack" class="stack-section">
     <div class="section-eyebrow">FEATURED · CLAUDE CODE LOOP</div>
-    <h2 class="section-h">The voice / gesture / agent stack</h2>
+    <h2 class="section-h">The voice / gesture / agent / memory stack</h2>
     <p class="section-sub">
-      Three tools, one story: speak a task, gesture to confirm, watch an autonomous Claude Code agent
-      run it. Each layer is shippable on its own; together they're a complete local loop.
+      Four tools, one story: speak a task, gesture to confirm, watch an autonomous Claude Code agent
+      run it — and a silent memory layer learning from every correction. Each layer is shippable on its
+      own; together they're a complete local loop.
     </p>
 
     <div class="stack">
@@ -362,14 +367,24 @@
         <p>Voice task → autonomous Claude Code agent runs it in a sandbox. Each task gets a neon-cursor puck on the screen edge with live status and pause / cancel / amend.</p>
         <div class="links"><span class="demo">live demo →</span><span class="gh">· github</span></div>
       </a>
+
+      <a class="layer memory" href="https://casterlygit.github.io/shed/" target="_blank" rel="noopener">
+        <div class="modality">MODALITY · MEMORY</div>
+        <div class="icon">🧠</div>
+        <h3>shed <span class="c">·</span></h3>
+        <p>Silent shadow layer for Claude Code. Picks the 2-3 most relevant notes from your past, watches for corrections, queues them for one-key approval. Local embeddings, local-only by default.</p>
+        <div class="links"><span class="demo">live demo →</span><span class="gh">· github</span></div>
+      </a>
     </div>
 
     <div class="stack-flow">
       <span class="node"><span class="dot voice"></span> hold hotkey, speak</span>
       <span class="arrow">→</span>
+      <span class="node"><span class="dot memory"></span> shed prepends past lessons</span>
+      <span class="arrow">→</span>
       <span class="node"><span class="dot agent"></span> agent runs in sandbox</span>
       <span class="arrow">→</span>
-      <span class="node"><span class="dot gesture"></span> 👍 to approve, 👎 to deny</span>
+      <span class="node"><span class="dot gesture"></span> 👍 to approve</span>
       <span class="arrow">→</span>
       <span class="node">✅ done</span>
     </div>
