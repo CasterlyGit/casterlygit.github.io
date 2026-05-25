@@ -364,7 +364,7 @@
         <div class="modality">MODALITY · AGENT OUT</div>
         <div class="icon">🤖</div>
         <h3>curby <span class="c">·</span></h3>
-        <p>Voice task → autonomous Claude Code agent runs it in a sandbox. Each task gets a neon-cursor puck on the screen edge with live status and pause / cancel / amend.</p>
+        <p>Voice → spoken Claude reply in <strong>~780ms</strong> (measured). Quick-ask (Ctrl+Space) or agent dispatch (Ctrl+Shift+Space → sandboxed Claude Code with neon puck). AVSpeechSynthesizer in-process: 125ms warm TTFS. Pluggable backends, prewarm on startup, interrupt mid-speech. v0.4 — <code>curby stats</code> shows P50/P95 from your real session log.</p>
         <div class="links"><span class="demo">live demo →</span><span class="gh">· github</span></div>
       </a>
 
@@ -372,7 +372,7 @@
         <div class="modality">MODALITY · MEMORY</div>
         <div class="icon">🧠</div>
         <h3>shed <span class="c">·</span></h3>
-        <p>Silent shadow layer for Claude Code. Picks the 2-3 most relevant notes from your past, watches for corrections, queues them for one-key approval. Local embeddings, local-only by default.</p>
+        <p>Hook layer for Claude Code that learns from you. bge-small-en-v1.5 via ONNX — <strong>6ms encode</strong>, no LLM in the retrieval path. Injects the 2–3 most relevant memories, detects corrections, learns which tool approvals to automate. v0.2 — <code>shed stats</code> tracks injection hit rate and proposal accept/reject ratio. Local-only, fail-open.</p>
         <div class="links"><span class="demo">live demo →</span><span class="gh">· github</span></div>
       </a>
     </div>
